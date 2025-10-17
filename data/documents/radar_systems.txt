@@ -1,0 +1,1 @@
+Radar accuracy improved after updating the signal processing algorithms. Noise reduction filters allowed faint echoes to be distinguished more clearly. Field evaluations confirmed that moving targets could now be separated from clutter with higher precision.

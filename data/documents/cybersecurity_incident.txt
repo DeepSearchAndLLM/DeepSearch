@@ -1,0 +1,1 @@
+Unusual network traffic patterns revealed misconfigured services that exposed sensitive data. The security team mitigated the risk by resetting keys and tightening access rules. Post-incident reviews emphasized stronger authentication and continuous monitoring.

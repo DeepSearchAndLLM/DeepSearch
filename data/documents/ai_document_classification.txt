@@ -1,0 +1,1 @@
+A machine learning model grouped documents based on semantic similarity rather than exact keywords. The embeddings allowed researchers to find related reports even when terminology varied. This approach significantly reduced manual indexing efforts.

@@ -1,0 +1,1 @@
+Temperature shifts can cause sensor readings to drift, making compensation essential. Calibration protocols require biannual comparison against reference instruments. Any unit exceeding tolerance thresholds is pulled from service and recorded for quality audits.

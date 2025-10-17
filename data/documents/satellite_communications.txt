@@ -1,0 +1,1 @@
+Low Earth orbit satellites experienced signal dropouts during solar activity spikes. Adaptive modulation techniques helped maintain data throughput under adverse conditions. Ground stations logged these anomalies for predictive modeling.
