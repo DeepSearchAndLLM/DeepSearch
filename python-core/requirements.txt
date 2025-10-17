@@ -1,0 +1,15 @@
+pydantic
+pydantic-settings
+
+langchain-chroma
+
+python-dotenv
+
+langchain
+langgraph
+langchainhub
+langchain-community
+langchain-core
+langchain-huggingface
+
+sentence-transformers
