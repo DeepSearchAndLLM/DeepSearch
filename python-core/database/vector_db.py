@@ -8,6 +8,7 @@ def get_vector_db():
     os.makedirs(settings.CHROMA_PATH, exist_ok=True)
     embeddings = get_embedding_model()
     db = Chroma(
+        collection_name="test_name", # multiple collections within the same database
         persist_directory=settings.CHROMA_PATH,
         embedding_function=embeddings,
         #collection_name = 'RAG',
