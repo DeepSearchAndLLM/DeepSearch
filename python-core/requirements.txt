@@ -5,6 +5,8 @@ langchain-chroma
 
 python-dotenv
 
+langsmith
+
 langchain
 langgraph
 langchainhub
@@ -16,4 +18,9 @@ langchain-huggingface
 langchain_text_splitters
 tiktoken
 
+#embedding
 sentence-transformers
+
+#LLM
+ollama
+langchain-ollama
