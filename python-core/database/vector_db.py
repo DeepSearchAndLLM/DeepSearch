@@ -9,7 +9,8 @@ def get_vector_db():
     embeddings = get_embedding_model()
     db = Chroma(
         persist_directory=settings.CHROMA_PATH,
-        embedding_function=embeddings
+        embedding_function=embeddings,
+        #collection_name = 'RAG',
     )
     return db
 

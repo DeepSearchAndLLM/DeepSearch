@@ -12,4 +12,8 @@ langchain-community
 langchain-core
 langchain-huggingface
 
+#split package
+langchain_text_splitters
+tiktoken
+
 sentence-transformers
