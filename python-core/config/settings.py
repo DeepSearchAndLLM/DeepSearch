@@ -2,7 +2,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 
 class Settings(BaseSettings):
-    CHROMA_PATH: str = "python-core/scripts/chroma_db"
+    #CHROMA_PATH: str = "python-core/scripts/chroma_db"
+    CHROMA_PATH: str = "chroma_db"
     EMBEDDING_MODEL: str = "multi-qa-distilbert-cos-v1"
     LLM_MODEL: str = "llama3:8b"
     OLLAMA_HOST: str = "http://localhost:11434"
