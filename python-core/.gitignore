@@ -181,5 +181,5 @@ fabric.properties
 # idea folder, uncomment if you don't need it
 .idea/
 
-scripts/chroma_db/
+scripts_setup/chroma_db/
 graph/nodes/chroma_db/
