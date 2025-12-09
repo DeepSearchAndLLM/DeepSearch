@@ -6,3 +6,4 @@ class GraphState(TypedDict, total=False):
     documents: List[str]
     generation: str
     meta: Any
+    llm_generation: bool
