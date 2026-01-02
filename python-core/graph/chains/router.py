@@ -38,4 +38,3 @@ route_prompt = ChatPromptTemplate.from_messages(
 )
 
 question_chain = route_prompt | structured_llm_router
-

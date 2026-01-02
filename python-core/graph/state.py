@@ -9,3 +9,4 @@ class GraphState(TypedDict, total=False):
     generation_retries: int
     #local_search_attempted: bool
     meta: Any
+    llm_generation: bool
