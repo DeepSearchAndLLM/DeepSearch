@@ -14,3 +14,7 @@ pydantic
 pydantic-settings
 tiktoken
 langsmith
+
+pdfplumber
+docx
+openpyxl
