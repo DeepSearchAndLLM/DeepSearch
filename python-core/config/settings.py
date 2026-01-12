@@ -7,7 +7,8 @@ class Settings(BaseSettings):
     CHROMA_PATH: str = str(Path(__file__).resolve().parent.parent / "chroma_db")
 
     EMBEDDING_MODEL: str = "multi-qa-distilbert-cos-v1"
-    LLM_MODEL: str = "llama3:8b"
+    LLM_MODEL: str = "llama3:8b"   # cevap üretmek için kullanılan model
+    CRITIC_MODEL: str = "llama3:8b"  # hallucination değerlendirmesi için kullanılan model
     OLLAMA_HOST: str = "http://localhost:11434"
 
     LANGCHAIN_API_KEY: str | None = None

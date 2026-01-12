@@ -6,10 +6,10 @@ from config.settings import Settings
 
 settings = Settings()
 
-llm = ChatOllama(
-    model=settings.LLM_MODEL,
-    base_url=settings.OLLAMA_HOST,
-    temperature=0,
+critic_llm = ChatOllama(
+    model = settings.CRITIC_MODEL, #gemma2
+    base_url = settings.OLLAMA_HOST,
+    temperature=0.0,
 )
 
 class GradeHallucination(BaseModel):
@@ -19,7 +19,7 @@ class GradeHallucination(BaseModel):
         description="Answer is grounded in the facts, 'yes' or 'no'",
     )
 
-structured_llm_grader = llm.with_structured_output(GradeHallucination)
+structured_llm_grader = critic_llm.with_structured_output(GradeHallucination)
 
 system_prompt = """
 You are a grader assessing whether an LLM generation is grounded in / supported by a set of retrieved facts. \n
