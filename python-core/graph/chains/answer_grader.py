@@ -13,7 +13,7 @@ class GradeAnswer(BaseModel):
     )
 
 llm = ChatOllama(
-    model=settings.LLM_MODEL,
+    model=settings.LIGHT_LLM_MODEL,
     base_url=settings.OLLAMA_HOST,
     temperature=0,
 )

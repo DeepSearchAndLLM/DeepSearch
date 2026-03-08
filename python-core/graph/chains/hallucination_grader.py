@@ -7,7 +7,7 @@ from config.settings import Settings
 settings = Settings()
 
 critic_llm = ChatOllama(
-    model = settings.CRITIC_MODEL, #gemma2
+    model = settings.LLM_MODEL,
     base_url = settings.OLLAMA_HOST,
     temperature=0.0,
 )

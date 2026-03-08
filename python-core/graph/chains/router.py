@@ -19,7 +19,7 @@ class RouteQuery(BaseModel):
     )
 
 llm = ChatOllama(
-    model=settings.LLM_MODEL,
+    model=settings.LIGHT_LLM_MODEL,
     base_url=settings.OLLAMA_HOST,
     temperature=0,
 )
@@ -28,6 +28,8 @@ structured_llm_router = llm.with_structured_output(RouteQuery)
 system = """
 You are an expert at routing a user question to a vectorsearch or local llm search.
 Use the vectorsearch for questions on users ask. For all else use local llm search.
+
+CRITICAL: When in doubt, ALWAYS choose VECTORSTORE.
 """
 
 route_prompt = ChatPromptTemplate.from_messages(

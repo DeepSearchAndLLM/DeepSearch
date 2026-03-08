@@ -59,5 +59,5 @@ def generate(state: GraphState) -> Dict[str, Any]:
         "generation": generation,
         "question": question,
         "generation_retries": retries + 1,
-        "sources": source_files,              # 👈 KEY FEATURE
+        "sources": source_files,
     }

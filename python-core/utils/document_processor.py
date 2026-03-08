@@ -1,4 +1,7 @@
+# utils/document_processor.py
+
 import os
+from datetime import datetime
 import pdfplumber
 from docx import Document as DocxDocument
 from openpyxl import load_workbook
@@ -40,52 +43,46 @@ def load_excel_file(path):
     return [Document(page_content=text, metadata={"source": os.path.basename(path)})]
 
 
-# 🔥 Eksik olan: Dosya bazlı yükleme fonksiyonu
 def load_documents_for_file(path: str):
     filename = os.path.basename(path)
 
     if filename.endswith(".txt"):
         return load_text_file(path)
-
     if filename.endswith(".pdf"):
         return load_pdf_file(path)
-
     if filename.endswith(".docx"):
         return load_docx_file(path)
-
     if filename.endswith(".xlsx"):
         return load_excel_file(path)
 
     return []
 
 
-# (Tüm klasörü yüklemek istersen kullanılan eski fonksiyon)
-def load_documents(directory: str):
-    docs = []
+def get_file_metadata(file_path: str) -> dict:
+    """
+    gather metadata from file
+    """
+    import os
+    from datetime import datetime
 
-    for filename in os.listdir(directory):
-        path = os.path.join(directory, filename)
+    file_stats = os.stat(file_path)
 
-        if filename.endswith(".txt"):
-            docs.extend(load_text_file(path))
-
-        elif filename.endswith(".pdf"):
-            docs.extend(load_pdf_file(path))
-
-        elif filename.endswith(".docx"):
-            docs.extend(load_docx_file(path))
-
-        elif filename.endswith(".xlsx"):
-            docs.extend(load_excel_file(path))
-
-    return docs
+    return {
+        'file_name': os.path.basename(file_path),
+        'file_path': file_path,
+        'file_size': file_stats.st_size,  # Byte
+        'created_date': datetime.fromtimestamp(file_stats.st_ctime).isoformat(),
+        'modified_date': datetime.fromtimestamp(file_stats.st_mtime).isoformat(),
+        'extension': os.path.splitext(file_path)[1]
+    }
 
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+
 def split_documents_tiktoken(documents, chunk_size=250, chunk_overlap=0):
     """
-    It splits documents into smaller pieces using a TikTok-based splitter.
+    Chunking
     """
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
         chunk_size=chunk_size,
@@ -93,4 +90,32 @@ def split_documents_tiktoken(documents, chunk_size=250, chunk_overlap=0):
     )
 
     docs_split = text_splitter.split_documents(documents)
+    return docs_split
+
+
+def add_chunk_metadata(docs_split, file_path: str):
+    """
+    add chunk metadata
+
+    Args:
+        docs_split: split documents
+        file_path: file path of document
+
+    Returns:
+        documents with metadata
+    """
+    file_metadata = get_file_metadata(file_path)
+
+    for i, doc in enumerate(docs_split):
+        doc.metadata.update({
+            "source": file_metadata['file_name'],
+            "chunk_index": i,
+            "total_chunks": len(docs_split),
+            "chunk_size": len(doc.page_content),
+            "file_size": file_metadata['file_size'],
+            "file_path": file_metadata['file_path'],
+            "upload_date": file_metadata['modified_date'],
+            "extension": file_metadata['extension']
+        })
+
     return docs_split

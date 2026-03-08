@@ -6,10 +6,12 @@ class Settings(BaseSettings):
     # Artık absolute path olarak veriyoruz
     CHROMA_PATH: str = str(Path(__file__).resolve().parent.parent / "chroma_db")
 
-    EMBEDDING_MODEL: str = "multi-qa-distilbert-cos-v1"
+    #EMBEDDING_MODEL: str = "multi-qa-distilbert-cos-v1"
+    EMBEDDING_MODEL: str = "nomic-embed-text"
 
-    #EMBEDDING_MODEL: str = "llama3:8b"
-    LLM_MODEL: str = "llama3:8b"
+    LLM_MODEL: str = "deepseek-r1:8b"
+    LIGHT_LLM_MODEL: str = "llama3.2:3b"
+    #LLM_MODEL: str = "llama3:8b"
     OLLAMA_HOST: str = "http://localhost:11434"
 
     LANGCHAIN_API_KEY: str | None = None
