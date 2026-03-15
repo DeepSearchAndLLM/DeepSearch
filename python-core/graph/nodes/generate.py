@@ -1,6 +1,31 @@
 from typing import Any, Dict
 from graph.chains.generation import generation_chain
-from graph.state import GraphState
+from graph.state import GraphState, SourceReference
+
+
+def _build_source_reference(doc) -> SourceReference:
+    """
+    Builds a rich source reference from a document's metadata.
+    Includes page number (PDF), line range (TXT), or paragraph index (DOCX).
+    """
+    m = doc.metadata
+    ref: SourceReference = {
+        "file_name": m.get("source", "unknown"),
+        "chunk_index": m.get("chunk_index"),
+        "total_chunks": m.get("total_chunks"),
+        "excerpt": doc.page_content[:150].strip() + "..." if len(doc.page_content) > 150 else doc.page_content.strip(),
+    }
+
+    # File-type specific location info
+    if "page_number" in m:
+        ref["page_number"] = m["page_number"]
+    if "line_start" in m:
+        ref["line_start"] = m["line_start"]
+        ref["line_end"] = m.get("line_end")
+    if "paragraph_index" in m:
+        ref["paragraph_index"] = m["paragraph_index"]
+
+    return ref
 
 
 def generate(state: GraphState) -> Dict[str, Any]:
@@ -36,15 +61,31 @@ def generate(state: GraphState) -> Dict[str, Any]:
     else:
         context_for_generation = documents
 
-    source_files = []
-
+    # Build rich source references
+    sources = []
     if not use_llm_knowledge:
+        seen = set()
         for doc in context_for_generation:
-            if hasattr(doc, "metadata") and "source" in doc.metadata:
-                source_files.append(doc.metadata["source"])
+            # Deduplicate by (file_name, chunk_index)
+            key = (
+                doc.metadata.get("source"),
+                doc.metadata.get("chunk_index")
+            )
+            if key not in seen:
+                seen.add(key)
+                sources.append(_build_source_reference(doc))
 
-        # Remove duplicates while preserving content integrity
-        source_files = list(set(source_files))
+        # Log for debugging
+        for ref in sources:
+            location = ""
+            if "page_number" in ref:
+                location = f"page {ref['page_number']}"
+            elif "line_start" in ref:
+                location = f"lines {ref['line_start']}-{ref['line_end']}"
+            elif "paragraph_index" in ref:
+                location = f"paragraph {ref['paragraph_index']}"
+            print(f"   SOURCE: {ref['file_name']} | chunk {ref['chunk_index']} | {location}")
+            print(f"   EXCERPT: {ref['excerpt'][:80]}...")
 
     generation = generation_chain.invoke(
         {
@@ -53,11 +94,10 @@ def generate(state: GraphState) -> Dict[str, Any]:
         }
     )
 
-
     return {
-        "documents": documents,              # original docs for grading
+        "documents": documents,
         "generation": generation,
         "question": question,
         "generation_retries": retries + 1,
-        "sources": source_files,
+        "sources": sources,
     }

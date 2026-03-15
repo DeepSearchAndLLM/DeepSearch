@@ -1,4 +1,4 @@
-# database/setup_database.py
+# scripts_setup/setup_database.py
 
 import sys
 import os
@@ -20,17 +20,16 @@ def main():
 
     for filename in os.listdir(DOCUMENTS_DIR):
         if not (
-                filename.endswith(".txt")
-                or filename.endswith(".pdf")
-                or filename.endswith(".docx")
-                or filename.endswith(".xlsx")
+            filename.endswith(".txt")
+            or filename.endswith(".pdf")
+            or filename.endswith(".docx")
         ):
             continue
 
         file_path = os.path.join(DOCUMENTS_DIR, filename)
         print(f"\nprocessing: {filename}")
 
-        # duplicate control
+        # Duplicate control
         existing = db.get(where={"source": filename})
         if existing and len(existing["ids"]) > 0:
             print(f"skipped: {filename} already exists")
@@ -41,21 +40,25 @@ def main():
             print(f"document could not be read or empty: {filename}")
             continue
 
-        # chunking / change if needed
-        docs_split = split_documents_tiktoken(documents, chunk_size=250, chunk_overlap=20)
-
+        docs_split = split_documents_tiktoken(documents, chunk_size=600, chunk_overlap=80)
         docs_split = add_chunk_metadata(docs_split, file_path)
         db.add_documents(docs_split)
 
-        print(f"added: {filename} ({len(docs_split)} chunk)")
+        print(f"added: {filename} ({len(docs_split)} chunks)")
 
         if docs_split:
-            print(f"metadata:")
-            print(f"      - Source: {docs_split[0].metadata.get('source')}")
-            print(f"      - Chunk index: {docs_split[0].metadata.get('chunk_index')}")
-            print(f"      - Total chunks: {docs_split[0].metadata.get('total_chunks')}")
-            print(f"      - File size: {docs_split[0].metadata.get('file_size')} bytes")
-            print(f"      - Upload date: {docs_split[0].metadata.get('upload_date')}")
+            print(f"metadata sample (first chunk):")
+            m = docs_split[0].metadata
+            print(f"      - Source:      {m.get('source')}")
+            print(f"      - Chunk index: {m.get('chunk_index')}")
+            print(f"      - Total chunks:{m.get('total_chunks')}")
+            # Page/line info depends on file type
+            if "page_number" in m:
+                print(f"      - Page number: {m.get('page_number')}")
+            if "line_start" in m:
+                print(f"      - Lines:       {m.get('line_start')} → {m.get('line_end')}")
+            if "paragraph_index" in m:
+                print(f"      - Paragraph:   {m.get('paragraph_index')}")
 
     print("\nfinished\n")
 
