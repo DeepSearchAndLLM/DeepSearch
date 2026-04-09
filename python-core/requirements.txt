@@ -12,6 +12,8 @@ sentence-transformers
 huggingface_hub
 pydantic
 pydantic-settings
+fastapi
+uvicorn
 tiktoken
 langsmith
 

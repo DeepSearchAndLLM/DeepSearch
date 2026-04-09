@@ -1,13 +1,9 @@
 from langchain_core.output_parsers import StrOutputParser
-from langsmith import Client
 from config.settings import Settings
 from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 
 settings = Settings()
-
-client = Client()
-#prompt = client.pull_prompt("rlm/rag-prompt")
 
 
 prompt = ChatPromptTemplate.from_messages([

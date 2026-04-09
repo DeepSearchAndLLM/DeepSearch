@@ -11,6 +11,8 @@ def _build_source_reference(doc) -> SourceReference:
     m = doc.metadata
     ref: SourceReference = {
         "file_name": m.get("source", "unknown"),
+        "file_path": m.get("file_path"),
+        "extension": m.get("extension"),
         "chunk_index": m.get("chunk_index"),
         "total_chunks": m.get("total_chunks"),
         "excerpt": doc.page_content[:150].strip() + "..." if len(doc.page_content) > 150 else doc.page_content.strip(),

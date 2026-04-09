@@ -5,6 +5,8 @@ from langchain_core.documents import Document
 class SourceReference(TypedDict, total=False):
     """Represents a single source chunk used in generation."""
     file_name: str
+    file_path: str
+    extension: str
     chunk_index: int
     total_chunks: int
     page_number: int      # page number for pdf
