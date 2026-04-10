@@ -121,7 +121,7 @@ def get_file_metadata(file_path: str) -> dict:
     }
 
 
-def split_documents_tiktoken(documents: list[Document], chunk_size=600, chunk_overlap=80) -> list[Document]:
+def split_documents_tiktoken(documents: list[Document], chunk_size=300, chunk_overlap=100) -> list[Document]:
     """
     Splits documents into chunks using tiktoken encoder.
     Preserves existing metadata (page_number, line_start, etc.)

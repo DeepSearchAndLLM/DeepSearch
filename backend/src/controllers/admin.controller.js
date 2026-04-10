@@ -1,9 +1,13 @@
 const {
+  assignUserToTeam,
+  createTeam,
   createUserAccount,
   getAdminDocuments,
+  getTeamsWithAccess,
   getUsersWithPermissions,
+  replaceTeamDocumentAccess,
   syncDocumentsFromFilesystem,
-  replaceUserDocumentPermissions,
+  updateTeam,
 } = require("../services/admin.service");
 
 async function listUsers(req, res, next) {
@@ -19,6 +23,37 @@ async function createUser(req, res, next) {
   try {
     const user = await createUserAccount(req.body);
     res.status(201).json({ user });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function listTeams(req, res, next) {
+  try {
+    const teams = await getTeamsWithAccess();
+    res.json({ teams });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function createTeamHandler(req, res, next) {
+  try {
+    const team = await createTeam(req.body);
+    res.status(201).json({ team });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function updateTeamHandler(req, res, next) {
+  try {
+    const teamId = Number(req.params.teamId);
+    const team = await updateTeam({
+      teamId,
+      name: req.body.name,
+    });
+    res.json({ team });
   } catch (error) {
     next(error);
   }
@@ -42,14 +77,30 @@ async function syncDocuments(req, res, next) {
   }
 }
 
-async function updateUserPermissions(req, res, next) {
+async function updateUserTeam(req, res, next) {
   try {
     const userId = Number(req.params.userId);
+    const { teamId } = req.body;
+
+    const result = await assignUserToTeam({
+      userId,
+      teamId,
+    });
+
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function updateTeamDocuments(req, res, next) {
+  try {
+    const teamId = Number(req.params.teamId);
     const actorId = req.user.id;
     const { documentIds } = req.body;
 
-    const result = await replaceUserDocumentPermissions({
-      userId,
+    const result = await replaceTeamDocumentAccess({
+      teamId,
       documentIds,
       actorId,
     });
@@ -61,9 +112,13 @@ async function updateUserPermissions(req, res, next) {
 }
 
 module.exports = {
+  createTeamHandler,
   listUsers,
+  listTeams,
   createUser,
   listDocuments,
   syncDocuments,
-  updateUserPermissions,
+  updateTeamHandler,
+  updateTeamDocuments,
+  updateUserTeam,
 };

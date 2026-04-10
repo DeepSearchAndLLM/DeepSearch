@@ -24,7 +24,7 @@ async function listDocumentsForUser(user) {
 
   const result = await query(
     `
-      SELECT
+      SELECT DISTINCT
         d.id,
         d.file_name,
         d.file_path,
@@ -34,9 +34,11 @@ async function listDocumentsForUser(user) {
         d.updated_at,
         d.last_indexed_at
       FROM documents d
-      INNER JOIN document_permissions dp
-        ON dp.document_id = d.id
-      WHERE dp.user_id = $1
+      INNER JOIN team_documents td
+        ON td.document_id = d.id
+      INNER JOIN users u
+        ON u.team_id = td.team_id
+      WHERE u.id = $1
         AND d.is_active = TRUE
       ORDER BY d.file_name ASC
     `,
