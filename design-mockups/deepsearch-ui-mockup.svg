@@ -1,0 +1,126 @@
+<svg width="1600" height="1080" viewBox="0 0 1600 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="160" y1="40" x2="1450" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4F7FB"/>
+      <stop offset="1" stop-color="#EDF3FA"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#60A5FA"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#0F172A" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      .title { font: 700 28px 'Arial', sans-serif; fill: #0F172A; }
+      .subtitle { font: 400 14px 'Arial', sans-serif; fill: #64748B; }
+      .section { font: 700 16px 'Arial', sans-serif; fill: #0F172A; }
+      .body { font: 400 14px 'Arial', sans-serif; fill: #475569; }
+      .small { font: 600 12px 'Arial', sans-serif; fill: #64748B; letter-spacing: 0.08em; }
+      .nav { font: 600 15px 'Arial', sans-serif; fill: #334155; }
+      .navActive { font: 700 15px 'Arial', sans-serif; fill: #1D4ED8; }
+      .chip { font: 700 11px 'Arial', sans-serif; fill: #1E3A8A; }
+      .button { font: 700 14px 'Arial', sans-serif; fill: white; }
+      .label { font: 600 13px 'Arial', sans-serif; fill: #334155; }
+      .muted { font: 500 12px 'Arial', sans-serif; fill: #94A3B8; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1080" fill="url(#bg)"/>
+  <rect x="48" y="40" width="1504" height="1000" rx="32" fill="#F8FBFF" stroke="#D7E3F2"/>
+
+  <text x="92" y="98" class="title">DeepSearch UI Preview</text>
+  <text x="92" y="124" class="subtitle">Simple login first. Main app opens directly to chat. Admin panel only appears for admin users.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="92" y="164" width="504" height="336" rx="28" fill="#FFFFFF"/>
+  </g>
+  <text x="124" y="212" class="small">LOGIN SCREEN</text>
+  <text x="124" y="250" class="title">Simple sign in</text>
+  <text x="124" y="276" class="subtitle">No left-side text blocks. Just logo, fields and one primary button.</text>
+  <circle cx="498" cy="216" r="26" fill="#E0ECFF"/>
+  <text x="485" y="224" class="section">DS</text>
+
+  <text x="124" y="334" class="label">Email</text>
+  <rect x="124" y="346" width="440" height="52" rx="16" fill="#F8FAFC" stroke="#D7E3F2"/>
+  <text x="146" y="378" class="body">admin@deepsearch.local</text>
+
+  <text x="124" y="432" class="label">Password</text>
+  <rect x="124" y="444" width="440" height="52" rx="16" fill="#F8FAFC" stroke="#D7E3F2"/>
+  <text x="146" y="476" class="body">••••••••••••</text>
+
+  <rect x="124" y="516" width="440" height="56" rx="18" fill="url(#accent)"/>
+  <text x="287" y="550" class="button">Sign in to DeepSearch</text>
+
+  <g filter="url(#shadow)">
+    <rect x="628" y="164" width="860" height="820" rx="28" fill="#FFFFFF"/>
+  </g>
+  <text x="660" y="212" class="small">MAIN APP</text>
+  <text x="660" y="250" class="title">Chat-first workspace</text>
+  <text x="660" y="276" class="subtitle">Reference layout kept simple: left sidebar, large chat area, top utility bar.</text>
+
+  <rect x="660" y="308" width="220" height="632" rx="24" fill="#F8FBFF" stroke="#D7E3F2"/>
+  <circle cx="696" cy="350" r="14" fill="#DBEAFE"/>
+  <text x="719" y="355" class="section">DeepSearch</text>
+
+  <rect x="676" y="390" width="188" height="42" rx="14" fill="#DBEAFE"/>
+  <text x="705" y="416" class="navActive">Dashboard</text>
+
+  <rect x="676" y="442" width="188" height="42" rx="14" fill="#FFFFFF"/>
+  <text x="705" y="468" class="nav">Chat</text>
+
+  <rect x="676" y="494" width="188" height="42" rx="14" fill="#FFFFFF"/>
+  <text x="705" y="520" class="nav">Documents</text>
+
+  <rect x="676" y="546" width="188" height="42" rx="14" fill="#FFFFFF"/>
+  <text x="705" y="572" class="nav">Sources</text>
+
+  <rect x="676" y="598" width="188" height="42" rx="14" fill="#FFFFFF"/>
+  <text x="705" y="624" class="nav">Admin</text>
+  <text x="705" y="646" class="muted">Only visible for admin</text>
+
+  <rect x="676" y="712" width="188" height="104" rx="18" fill="#F1F5F9"/>
+  <text x="694" y="742" class="small">DASHBOARD</text>
+  <text x="694" y="772" class="body">Visible docs: 14</text>
+  <text x="694" y="796" class="body">Team: Network</text>
+
+  <rect x="676" y="848" width="188" height="56" rx="18" fill="#FFFFFF" stroke="#D7E3F2"/>
+  <text x="740" y="882" class="nav">Sign Out</text>
+
+  <rect x="904" y="308" width="552" height="72" rx="24" fill="#FFFFFF" stroke="#D7E3F2"/>
+  <text x="936" y="338" class="small">CURRENT VIEW</text>
+  <text x="936" y="364" class="section">Chat</text>
+  <circle cx="1376" cy="344" r="18" fill="#F1F5F9"/>
+  <circle cx="1424" cy="344" r="18" fill="#F1F5F9"/>
+
+  <rect x="904" y="400" width="552" height="396" rx="24" fill="#FCFEFF" stroke="#D7E3F2"/>
+  <rect x="928" y="430" width="228" height="74" rx="18" fill="#F1F5F9"/>
+  <text x="948" y="458" class="small">QUESTION</text>
+  <text x="948" y="482" class="body">Radar sistemleriyle ilgili</text>
+  <text x="948" y="502" class="body">dokumanlarda ne anlatiliyor?</text>
+
+  <rect x="1090" y="526" width="342" height="128" rx="20" fill="#DBEAFE"/>
+  <text x="1112" y="556" class="small">ANSWER</text>
+  <text x="1112" y="584" class="body">Sistem yalnizca izinli dokumanlarda</text>
+  <text x="1112" y="606" class="body">arama yapar ve cevabi kaynaklarla</text>
+  <text x="1112" y="628" class="body">birlikte dondurur.</text>
+
+  <rect x="928" y="676" width="216" height="92" rx="18" fill="#FFFFFF" stroke="#D7E3F2"/>
+  <text x="948" y="704" class="small">SOURCE</text>
+  <text x="948" y="730" class="body">radar_systems.txt</text>
+  <text x="948" y="752" class="muted">Lines 42-68</text>
+
+  <rect x="1164" y="676" width="268" height="92" rx="18" fill="#FFFFFF" stroke="#D7E3F2"/>
+  <text x="1184" y="704" class="small">SOURCE</text>
+  <text x="1184" y="730" class="body">engineering_report.txt</text>
+  <text x="1184" y="752" class="muted">Lines 10-24</text>
+
+  <rect x="904" y="816" width="552" height="100" rx="24" fill="#FFFFFF" stroke="#D7E3F2"/>
+  <text x="932" y="850" class="body">Ask something about the documents you can access...</text>
+  <rect x="1288" y="836" width="144" height="58" rx="18" fill="url(#accent)"/>
+  <text x="1334" y="871" class="button">Send</text>
+
+  <rect x="1486" y="164" width="24" height="820" rx="12" fill="#F8FBFF"/>
+  <text x="124" y="614" class="subtitle">Mockup direction: minimalist login, calmer sidebar, chat starts as the default landing page,</text>
+  <text x="124" y="636" class="subtitle">and admin-only navigation appears conditionally.</text>
+</svg>
