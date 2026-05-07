@@ -184,3 +184,4 @@ fabric.properties
 scripts_setup/chroma_db/
 graph/nodes/chroma_db/
 chroma_db/
+evals/
