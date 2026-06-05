@@ -20,7 +20,10 @@ from langchain_core.embeddings import Embeddings
 
 from graph.nodes.generate import generate
 from graph.nodes.gradeDocuments import grade_documents
-from models.embedding_model import get_embedding_model
+from models.embedding_model import (
+    get_embedding_collection_name,
+    get_embedding_model,
+)
 
 
 SQUAD_URLS = {
@@ -54,15 +57,23 @@ class SerialEmbeddings(Embeddings):
         self.delay_seconds = delay_seconds
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
-        return [self.embed_query(text) for text in texts]
+        return [
+            self._embed_with_retry(text, is_query=False)
+            for text in texts
+        ]
 
     def embed_query(self, text: str) -> list[float]:
+        return self._embed_with_retry(text, is_query=True)
+
+    def _embed_with_retry(self, text: str, is_query: bool) -> list[float]:
         last_error = None
         for attempt in range(self.retries + 1):
             try:
                 if self.delay_seconds:
                     time.sleep(self.delay_seconds)
-                return self.wrapped.embed_query(text)
+                if is_query:
+                    return self.wrapped.embed_query(text)
+                return self.wrapped.embed_documents([text])[0]
             except Exception as exc:
                 last_error = exc
                 if attempt >= self.retries:
@@ -208,7 +219,7 @@ def get_store(
         delay_seconds=embedding_delay,
     )
     return Chroma(
-        collection_name=f"squad_v2_{split}",
+        collection_name=get_embedding_collection_name(f"squad_v2_{split}"),
         persist_directory=str(persist_dir),
         embedding_function=embedding_model,
         collection_metadata={"hnsw:space": "cosine"},

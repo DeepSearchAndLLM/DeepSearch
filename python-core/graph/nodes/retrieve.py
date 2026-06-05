@@ -2,10 +2,8 @@
 
 from typing import Any, Dict
 from graph.state import GraphState
-from database.vector_db import vectorstore, retriever
-from config.settings import Settings
-
-settings = Settings()
+from database.vector_db import vectorstore
+from config.settings import settings
 
 
 def retrieve(state: GraphState) -> Dict[str, Any]:
@@ -18,7 +16,7 @@ def retrieve(state: GraphState) -> Dict[str, Any]:
     # SIMILARITY SEARCH WITH SCORES
     docs_with_scores = vectorstore.similarity_search_with_score(
         question,
-        k=6
+        k=settings.RETRIEVAL_K,
     )
 
     print(f"Similarity Search Results:")
@@ -28,14 +26,14 @@ def retrieve(state: GraphState) -> Dict[str, Any]:
     seen_sources = set()
     filtered_docs = []
 
-    for i, (doc, score) in enumerate(docs_with_scores):
+    for i, (doc, distance) in enumerate(docs_with_scores):
         source = doc.metadata.get('source', 'Unknown')
 
-        # Threshold control
-        passed = score >= 0.2
+        # Chroma returns cosine distance here; lower values are more similar.
+        passed = distance <= settings.RETRIEVAL_MAX_COSINE_DISTANCE
         status = "✓" if passed else "✗"
 
-        print(f"\n   {i + 1}. {status} Score: {score:.3f}")
+        print(f"\n   {i + 1}. {status} Distance: {distance:.3f}")
         print(f"File: {source}")
 
         if passed:
@@ -44,7 +42,10 @@ def retrieve(state: GraphState) -> Dict[str, Any]:
 
 
     print(f"Total retrieved: {len(docs_with_scores)} chunks")
-    print(f"Passed threshold (≥0.2): {len(filtered_docs)} chunks")
+    print(
+        "Passed cosine distance threshold "
+        f"(≤{settings.RETRIEVAL_MAX_COSINE_DISTANCE}): {len(filtered_docs)} chunks"
+    )
     print(f"Unique files: {len(seen_sources)}")
 
     if seen_sources:
@@ -56,4 +57,3 @@ def retrieve(state: GraphState) -> Dict[str, Any]:
         print(f"\nNo documents passed threshold!")
 
     return {"documents": filtered_docs, "question": question}
-

@@ -1,19 +1,23 @@
 # database/vector_db.py
 
 from langchain_chroma import Chroma
-from models.embedding_model import get_embedding_model
+from models.embedding_model import (
+    get_embedding_collection_name,
+    get_embedding_model,
+)
 from config.settings import CHROMA_PATH, Settings
 import os
 
 embeddings = get_embedding_model()
 settings = Settings()
+COLLECTION_NAME = get_embedding_collection_name("nomic_collection")
 
 
 def get_vector_db():
     os.makedirs(CHROMA_PATH, exist_ok=True)
 
     db = Chroma(
-        collection_name="nomic_collection",
+        collection_name=COLLECTION_NAME,
         persist_directory=CHROMA_PATH,
         embedding_function=embeddings,
         collection_metadata={"hnsw:space": "cosine"}
@@ -22,7 +26,7 @@ def get_vector_db():
 
 
 vectorstore = Chroma(
-    collection_name="nomic_collection",
+    collection_name=COLLECTION_NAME,
     embedding_function=embeddings,
     persist_directory=CHROMA_PATH,
     collection_metadata={"hnsw:space": "cosine"}
@@ -31,7 +35,7 @@ vectorstore = Chroma(
 retriever = vectorstore.as_retriever(
     search_type="similarity_score_threshold",
     search_kwargs={
-        "k": 6,
-        "score_threshold": 0.2
+        "k": settings.RETRIEVAL_K,
+        "score_threshold": settings.RETRIEVAL_RELEVANCE_THRESHOLD,
     }
 )

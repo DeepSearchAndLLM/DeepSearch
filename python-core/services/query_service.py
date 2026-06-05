@@ -3,6 +3,7 @@ from typing import Any
 from database.vector_db import vectorstore
 from graph.nodes.generate import generate
 from graph.nodes.gradeDocuments import grade_documents
+from config.settings import settings
 
 NO_ANSWER_MESSAGE = (
     "Bu soruya izin verilen dokumanlarda dayali net bir cevap bulamadim."
@@ -20,7 +21,7 @@ def _build_filter(allowed_sources: list[str]) -> dict[str, Any] | None:
 def answer_question_with_scoped_documents(
     question: str,
     allowed_sources: list[str],
-    max_results: int = 8,
+    max_results: int = settings.RETRIEVAL_K,
 ) -> dict[str, Any]:
     normalized_question = question.strip()
     scoped_filter = _build_filter(allowed_sources)

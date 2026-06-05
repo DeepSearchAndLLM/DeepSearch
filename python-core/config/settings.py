@@ -8,6 +8,9 @@ class Settings(BaseSettings):
 
     #EMBEDDING_MODEL: str = "multi-qa-distilbert-cos-v1"
     EMBEDDING_MODEL: str = "nomic-embed-text"
+    RETRIEVAL_K: int = 20
+    RETRIEVAL_RELEVANCE_THRESHOLD: float = 0.2
+    RETRIEVAL_MAX_COSINE_DISTANCE: float = 0.8
 
     LLM_MODEL: str = "deepseek-r1:8b"
     LIGHT_LLM_MODEL: str = "llama3.2:3b"
@@ -34,4 +37,3 @@ CHROMA_PATH = str(BASE_DIR / "chroma_db")
 VECTOR_DB_PATH = BASE_DIR / "chroma_db"
 
 settings = Settings()
-
