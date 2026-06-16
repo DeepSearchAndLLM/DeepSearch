@@ -1,4 +1,7 @@
-const { listDocumentsForUser } = require("../services/document.service");
+const {
+  createDocumentForUser,
+  listDocumentsForUser,
+} = require("../services/document.service");
 
 async function listDocuments(req, res, next) {
   try {
@@ -9,6 +12,20 @@ async function listDocuments(req, res, next) {
   }
 }
 
+async function uploadDocument(req, res, next) {
+  try {
+    const document = await createDocumentForUser({
+      user: req.user,
+      file: req.file,
+    });
+
+    res.status(201).json({ document });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   listDocuments,
+  uploadDocument,
 };
