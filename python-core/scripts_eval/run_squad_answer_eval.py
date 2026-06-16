@@ -147,7 +147,10 @@ def contains_gold(prediction: str, gold_answers: list[str]) -> float:
 
 def looks_like_no_answer(answer: str) -> bool:
     normalized = normalize_answer(answer)
-    return any(phrase in normalized for phrase in NO_ANSWER_PHRASES)
+    return any(
+        normalize_answer(phrase) in normalized
+        for phrase in NO_ANSWER_PHRASES
+    )
 
 
 def iter_squad_examples(path: Path) -> Iterable[dict[str, Any]]:
@@ -176,6 +179,61 @@ def load_examples(path: Path, include_impossible: bool) -> list[dict[str, Any]]:
         if example["is_impossible"] and not include_impossible:
             continue
         examples.append(example)
+    return examples
+
+
+def select_examples(
+    examples: list[dict[str, Any]],
+    question_id: str | None,
+    question_number: int | None,
+    question_text: str | None,
+    limit: int,
+) -> list[dict[str, Any]]:
+    if question_id:
+        matches = [example for example in examples if example["id"] == question_id]
+        if not matches:
+            raise ValueError(f"No SQuAD question found with ID {question_id!r}.")
+        return matches
+
+    if question_number is not None:
+        if question_number < 1 or question_number > len(examples):
+            raise ValueError(
+                f"Question number must be between 1 and {len(examples)}."
+            )
+        return [examples[question_number - 1]]
+
+    if question_text:
+        normalized_query = question_text.strip().casefold()
+        exact_matches = [
+            example
+            for example in examples
+            if example["question"].strip().casefold() == normalized_query
+        ]
+        if exact_matches:
+            return exact_matches
+
+        partial_matches = [
+            example
+            for example in examples
+            if normalized_query in example["question"].casefold()
+        ]
+        if not partial_matches:
+            raise ValueError(
+                f"No SQuAD question contains the text {question_text!r}."
+            )
+        if len(partial_matches) > 1:
+            choices = "\n".join(
+                f"  {example['id']}: {example['question']}"
+                for example in partial_matches[:10]
+            )
+            raise ValueError(
+                "Question text matched multiple examples. Use --question-id "
+                f"with one of these IDs:\n{choices}"
+            )
+        return partial_matches
+
+    if limit:
+        return examples[:limit]
     return examples
 
 
@@ -406,6 +464,8 @@ def answer_examples_with_full_graph(
                     "retrieval_hit": float(example["passage_id"] in retrieved_ids),
                     "generation_retries": result.get("generation_retries"),
                     "source_count": len(result.get("sources", [])),
+                    "quality_rejected": result.get("quality_rejected", False),
+                    "rejection_reason": result.get("rejection_reason"),
                     **scores,
                 }
             )
@@ -463,6 +523,25 @@ def main() -> int:
     parser.add_argument("--embedding-retries", type=int, default=5)
     parser.add_argument("--embedding-delay", type=float, default=0.15)
     parser.add_argument("--limit", type=int, default=50)
+    question_group = parser.add_mutually_exclusive_group()
+    question_group.add_argument(
+        "--question-id",
+        help="Run one SQuAD question by its dataset ID.",
+    )
+    question_group.add_argument(
+        "--question-number",
+        type=int,
+        help="Run one question by its 1-based position in the selected split.",
+    )
+    question_group.add_argument(
+        "--question-text",
+        help="Run one question by exact text or a unique case-insensitive substring.",
+    )
+    parser.add_argument(
+        "--list-questions",
+        action="store_true",
+        help="List selectable question numbers, IDs, and texts, then exit.",
+    )
     parser.add_argument(
         "--index-limit",
         type=int,
@@ -480,13 +559,43 @@ def main() -> int:
                 args.insecure_download,
             )
 
-        all_examples = load_examples(
+        dataset_examples = load_examples(
             dataset_path,
-            include_impossible=args.include_impossible,
+            include_impossible=True,
         )
-        examples = all_examples
-        if args.limit:
-            examples = examples[: args.limit]
+        all_examples = [
+            example
+            for example in dataset_examples
+            if args.include_impossible or not example["is_impossible"]
+        ]
+        if args.list_questions:
+            for number, example in enumerate(all_examples, start=1):
+                impossible = " [impossible]" if example["is_impossible"] else ""
+                print(
+                    f"{number}\t{example['id']}\t"
+                    f"{example['question']}{impossible}"
+                )
+            return 0
+
+        selection_examples = all_examples
+        if args.question_id or args.question_text:
+            # Explicit single-question selection should find impossible examples
+            # without requiring the caller to know about --include-impossible.
+            selection_examples = dataset_examples
+
+        examples = select_examples(
+            selection_examples,
+            question_id=args.question_id,
+            question_number=args.question_number,
+            question_text=args.question_text,
+            limit=args.limit,
+        )
+        if len(examples) == 1:
+            impossible = " [impossible]" if examples[0]["is_impossible"] else ""
+            print(
+                f"Selected question {examples[0]['id']}: "
+                f"{examples[0]['question']}{impossible}"
+            )
 
         store = get_store(
             split=args.split,
@@ -497,9 +606,9 @@ def main() -> int:
         )
         skipped_index_passages = []
         if args.mode in {"retrieval", "full-graph"}:
-            index_examples = all_examples
+            index_examples = dataset_examples
             if args.index_limit:
-                index_examples = all_examples[: args.index_limit]
+                index_examples = dataset_examples[: args.index_limit]
             skipped_index_passages = index_passages(
                 store,
                 build_passage_documents(index_examples),

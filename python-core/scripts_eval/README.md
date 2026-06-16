@@ -89,3 +89,40 @@ python-core/.venv/bin/python python-core/scripts_eval/run_squad_answer_eval.py \
 ```
 
 Use `oracle-context` to isolate whether the LLM can extract the right answer when the correct paragraph is already known. Use `retrieval` to test the fuller RAG path: retrieve a paragraph, generate an answer, then compare it to SQuAD's gold answer spans.
+
+### Run One SQuAD Question
+
+List the available answerable questions without starting Ollama or the vector store:
+
+```bash
+python-core/.venv/bin/python python-core/scripts_eval/run_squad_answer_eval.py \
+  --split dev \
+  --list-questions
+```
+
+Run one question through the full graph by its 1-based list number:
+
+```bash
+python-core/.venv/bin/python python-core/scripts_eval/run_squad_answer_eval.py \
+  --split dev \
+  --mode full-graph \
+  --question-number 1
+```
+
+You can also select a question by SQuAD ID or by a unique part of its text:
+
+```bash
+python-core/.venv/bin/python python-core/scripts_eval/run_squad_answer_eval.py \
+  --split dev \
+  --mode full-graph \
+  --question-id 56ddde6b9a695914005b9628
+
+python-core/.venv/bin/python python-core/scripts_eval/run_squad_answer_eval.py \
+  --split dev \
+  --mode full-graph \
+  --question-text "Duchy of Normandy founded"
+```
+
+Question selection by `--question-id` or `--question-text` automatically includes
+matching impossible examples. Add `--include-impossible` when listing impossible
+questions or including them in a multi-question evaluation.

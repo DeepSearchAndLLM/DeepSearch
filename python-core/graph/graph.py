@@ -13,6 +13,26 @@ RETRIEVE = "retrieve"
 GRADE_DOCUMENTS = "grade_documents"
 GENERATE = "generate"
 FALLBACK_TO_LLM = "fallback_to_llm"
+REJECT_HALLUCINATION = "reject_hallucination"
+REJECT_POOR_ANSWER = "reject_poor_answer"
+
+
+def _reject_generation(reason: str) -> dict:
+    print(f"---REJECT GENERATION: {reason}---")
+    return {
+        "generation": "I don't know.",
+        "sources": [],
+        "quality_rejected": True,
+        "rejection_reason": reason,
+    }
+
+
+def reject_hallucination(state: GraphState) -> dict:
+    return _reject_generation("hallucination_after_max_retries")
+
+
+def reject_poor_answer(state: GraphState) -> dict:
+    return _reject_generation("poor_answer_after_max_retries")
 
 
 def decide_after_grading(state: GraphState) -> str:
@@ -69,8 +89,8 @@ def decide_after_generation(state: GraphState) -> str:
 
     if not hallucination_score.binary_score:
         if retries >= MAX_RETRIES:
-            print(f"HALLUCINATION + MAX RETRIES ({MAX_RETRIES}) → END")
-            return END
+            print(f"HALLUCINATION + MAX RETRIES ({MAX_RETRIES}) → REJECT")
+            return REJECT_HALLUCINATION
         else:
             print(f"HALLUCINATION DETECTED → RE-GENERATE ({retries + 1}/{MAX_RETRIES})")
             return GENERATE
@@ -106,8 +126,8 @@ def _check_answer_quality(question: str, generation: str, retries: int, max_retr
         print("ANSWER DOES NOT ADDRESS QUESTION")
 
         if retries >= max_retries:
-            print(f"MAX RETRIES ({max_retries}) REACHED → END (accept poor answer)")
-            return END
+            print(f"MAX RETRIES ({max_retries}) REACHED → REJECT POOR ANSWER")
+            return REJECT_POOR_ANSWER
         else:
             print(f"→ RE-GENERATE ({retries + 1}/{max_retries})")
             return GENERATE
@@ -133,6 +153,8 @@ def build_graph():
     workflow.add_node(GRADE_DOCUMENTS, grade_documents)
     workflow.add_node(GENERATE, generate)
     workflow.add_node(FALLBACK_TO_LLM, fallback_to_llm)
+    workflow.add_node(REJECT_HALLUCINATION, reject_hallucination)
+    workflow.add_node(REJECT_POOR_ANSWER, reject_poor_answer)
 
     # ============================================
     # ENTRY POINT: Direkt RETRIEVE (router yok)
@@ -165,9 +187,13 @@ def build_graph():
         decide_after_generation,
         {
             GENERATE: GENERATE,
+            REJECT_HALLUCINATION: REJECT_HALLUCINATION,
+            REJECT_POOR_ANSWER: REJECT_POOR_ANSWER,
             END: END,
         },
     )
+    workflow.add_edge(REJECT_HALLUCINATION, END)
+    workflow.add_edge(REJECT_POOR_ANSWER, END)
 
     return workflow.compile()
 

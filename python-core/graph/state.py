@@ -21,6 +21,8 @@ class GraphState(TypedDict, total=False):
     documents: List[Document]
     generation: str
     generation_retries: int
+    quality_rejected: bool
+    rejection_reason: str
     sources: List[SourceReference]  # full reference
     meta: Any
     llm_generation: bool

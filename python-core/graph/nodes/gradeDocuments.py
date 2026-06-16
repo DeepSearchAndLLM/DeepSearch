@@ -1,15 +1,14 @@
-import asyncio
 from typing import Any, Dict
 
 from graph.chains.retrieval_grader import retrieval_grader
 from graph.state import GraphState
 
 
-async def _grade_single_doc(doc, question: str, index: int):
+def _grade_single_doc(doc, question: str, index: int):
     """
-    Single document grading - runs concurrently.
+    Single document grading.
     """
-    score = await retrieval_grader.ainvoke(
+    score = retrieval_grader.invoke(
         {"question": question, "document": doc.page_content}
     )
     grade = score.binary_score.lower()
@@ -21,34 +20,22 @@ async def _grade_single_doc(doc, question: str, index: int):
 
 def grade_documents(state: GraphState) -> Dict[str, Any]:
     """
-    All LLM calls fire simultaneously instead of sequentially using asyncio.gather().
+    Grade retrieved documents for relevance.
+
+    Keep this synchronous because the FastAPI endpoint runs in a worker thread.
+    Creating a fresh event loop per request with asyncio.run() can leave the
+    shared Ollama async client bound to a closed loop on later requests.
     """
-    print("---CHECK THE DOCUMENT RELEVANCE TO QUESTION (PARALLEL)---")
+    print("---CHECK THE DOCUMENT RELEVANCE TO QUESTION---")
 
     question = state["question"]
     documents = state["documents"]
+    filtered_docs = []
 
-    async def run_parallel():
-        tasks = [
-            _grade_single_doc(doc, question, i)
-            for i, doc in enumerate(documents)
-        ]
-        results = await asyncio.gather(*tasks)
-        return [doc for doc in results if doc is not None]
-
-    # We use get_event_loop instead of asyncio.run()
-    # because LangGraph may already be running in an async context
-    try:
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            # If LangGraph is in an async context, nest_asyncio is required
-            import nest_asyncio
-            nest_asyncio.apply()
-            filtered_docs = loop.run_until_complete(run_parallel())
-        else:
-            filtered_docs = loop.run_until_complete(run_parallel())
-    except RuntimeError:
-        filtered_docs = asyncio.run(run_parallel())
+    for i, doc in enumerate(documents):
+        graded_doc = _grade_single_doc(doc, question, i)
+        if graded_doc is not None:
+            filtered_docs.append(graded_doc)
 
     print(f"---GRADING COMPLETE: {len(filtered_docs)}/{len(documents)} documents passed---")
     return {"documents": filtered_docs}

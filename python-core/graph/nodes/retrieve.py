@@ -29,7 +29,7 @@ def retrieve(state: GraphState) -> Dict[str, Any]:
     for i, (doc, distance) in enumerate(docs_with_scores):
         source = doc.metadata.get('source', 'Unknown')
 
-        # Chroma returns cosine distance here; lower values are more similar.
+        # lower means more similar
         passed = distance <= settings.RETRIEVAL_MAX_COSINE_DISTANCE
         status = "✓" if passed else "✗"
 
